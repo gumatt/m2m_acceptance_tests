@@ -10,11 +10,16 @@ class LoginPage {
 }
 
 class HedgeTransPage {
-    constructor() {
-        this.createTransButton = Selector('#main-content > div.content-body > div > div > div.box-head.clearfix > div > a:nth-child(2)')
-        this.createTransButtonShort = Selector('div.box-head.clearfix > div > a:nth-child(2)')
-        this.hedgeTransModal = Selector('#add-hedge-tran')
-    }
+  constructor() {
+    this.createTransButton = Selector(
+      '#main-content > div.content-body > div > div > div.box-head.clearfix > div > a:nth-child(2)'
+    );
+    this.createTransButtonShort = Selector(
+      'div.box-head.clearfix > div > a:nth-child(2)'
+    );
+    this.hedgeTransModal = Selector('#add-hedge-tran');
+    this.hedgeTransForm = Selector('#hedge_tran_info');
+  }
 }
 
 export { LoginPage, HedgeTransPage };
