@@ -1,0 +1,11 @@
+{
+  "name": "m2m_tests",
+  "version": "0.0.1",
+  "description": "end-user tests for Powerhouse M2M application",
+  "main": "endUserTests.js",
+  "author": "mbw",
+  "license": "Y",
+  "dependencies": {
+    "testcafe": "^0.16.2"
+  }
+}
