@@ -1,20 +1,21 @@
 import { Role } from 'testcafe';
 
-import { LOGIN_PAGE, regularUser, adminUser } from './config';
+import { urls, user, admin } from './config';
 import { LoginPage } from './pages'
 import { f } from './common';
 
 const login = new LoginPage()
 
-const user = Role(LOGIN_PAGE, async t => {
-  await t
-    .typeText(login.usernameInput, 'atester')
-    .typeText(login.passwordInput, 'TeamLevine01')
-    .click(login.submitButton)
+const userRole = Role(urls.login, async t => {
+  await f.login(t, user.username, user.password)
+    // .typeText(login.usernameInput, user.username)
+    // .typeText(login.passwordInput, user.password)
+    // .click(login.submitButton)
 });
 
-const admin = Role(LOGIN_PAGE, async t => {
-  f.login(adminUser.username, adminUser.password);
+const adminRole = Role(urls.login, async t => {
+
+  f.login(adminUser.username, admin.password);
 });
 
-export { user, admin };
+export { userRole, adminRole };

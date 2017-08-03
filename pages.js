@@ -19,6 +19,13 @@ class HedgeTransPage {
     );
     this.hedgeTransModal = Selector('#add-hedge-tran');
     this.hedgeTransForm = Selector('#hedge_tran_info');
+    this.transTable = Selector('#users');
+    this.transData = Selector('#users > tbody').addCustomMethods({
+      getCellText: (table, rowIndex, columnIndex) => {
+        return table.rows[rowIndex].cells[columnIndex].innerText;
+      }
+    });
+    this.transTableRows = Selector('#user tbody tr');
   }
 }
 

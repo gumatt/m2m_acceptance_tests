@@ -1,45 +1,122 @@
 import { Selector, ClientFunction } from 'testcafe';
 
 import { f, getLocation } from './common';
-import {
-  LOGIN_PAGE,
-  HOME_PAGE,
-  HEDGE_TRANS_URL,
-  HEDGE_TXN_PAGE
-} from './config';
+import { urls, endpoints } from './config';
 import { HedgeTransPage } from './pages';
-import { user } from './roles';
+import { userRole as user } from './roles';
+import { simple_hedge_txn } from './transactions';
 
 const hedgeTransPage = new HedgeTransPage();
-user.preserveUrl = HEDGE_TXN_PAGE;
+user.preserveUrl = true;
 
-fixture `Enter Hedge Transaction`
-  .page`${HEDGE_TXN_PAGE}`.beforeEach(async t => {
-    user.preserveUrl = HEDGE_TXN_PAGE;
-  });
+fixture`Enter Hedge Transaction`
+  .page`${urls.hedge_txn_log}`.beforeEach(async t => {
+  await t.useRole(user).navigateTo(urls.hedge_txn_log);
+});
 
 test('Navigate to Hedge Trans', async t => {
-  await t.useRole(user);
-  await t.expect(getLocation()).contains(HEDGE_TRANS_URL);
+  // await t.useRole(user);
+  await t.expect(getLocation()).contains(endpoints.hedge_trans);
 });
 
 test('Open Hedge Trans Modal', async t => {
-  await t
-    .useRole(user)
-    .navigateTo(HEDGE_TXN_PAGE)
-    .click(hedgeTransPage.createTransButton);
+  await t.click(hedgeTransPage.createTransButton);
 
   await t.expect(hedgeTransPage.hedgeTransModal.visible).ok();
 });
 
-test('Enter Hedge Trans', async t => {
+test('Row and Column Count', async t => {
   await t
-    .useRole(user)
-    .navigateTo(HEDGE_TXN_PAGE)
-    .click(hedgeTransPage.createTransButton)
-    .typeText(hedgeTransPage.hedgeTransForm.find('#name'), 'test_txn_001');
+    .expect(hedgeTransPage.transTable.visible)
+    .ok()
+    .expect(hedgeTransPage.transData.getCellText(8, 4))
+    .eql('Gasoline');
+});
 
+test('Enter Simple Hedge Trans', async t => {
   await t
-    .expect(hedgeTransPage.hedgeTransForm.find('#name').value)
-    .eql('test_txn_001');
+    .click(hedgeTransPage.createTransButton)
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#name'),
+      simple_hedge_txn.name
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#hedge_trans_type'))
+    .click(
+      Selector('#hedge_trans_type > option').withText(
+        simple_hedge_txn.hedge_trans_type
+      )
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#hedge_account'))
+    .click(
+      Selector('#hedge_account > option').withText(
+        simple_hedge_txn.hedge_account
+      )
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#inventory'))
+    .click(Selector('#inventory > option').withText(simple_hedge_txn.inventory))
+    .click(hedgeTransPage.hedgeTransForm.find('#product'))
+    .click(Selector('#product > option').withText(simple_hedge_txn.product))
+    .click(hedgeTransPage.hedgeTransForm.find('#contract_entry'))
+    .click(
+      Selector('#contract_entry > option').withAttribute(
+        'value',
+        simple_hedge_txn.contract_entry
+      )
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#month_year'))
+    .click(
+      Selector('#month_year > option').withAttribute(
+        'value',
+        simple_hedge_txn.month_year
+      )
+    )
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#volume'),
+      simple_hedge_txn.volume.toString()
+    )
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#price'),
+      simple_hedge_txn.price.toString()
+    )
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#trans_date'),
+      simple_hedge_txn.trans_date,
+      { replace: true }
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#initial_pos'))
+    .click(
+      Selector('#initial_pos > option').withAttribute(
+        'value',
+        simple_hedge_txn.initial_pos.toString()
+      )
+    )
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#confirm_number'),
+      simple_hedge_txn.confirm_number,
+      { replace: true }
+    )
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#trader'),
+      simple_hedge_txn.trader,
+      { replace: true }
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#status'))
+    .click(
+      Selector('#status > option').withAttribute(
+        'value',
+        simple_hedge_txn.status.toLowerCase()
+      )
+    )
+    .typeText(
+      hedgeTransPage.hedgeTransForm.find('#program'),
+      simple_hedge_txn.program,
+      { replace: true }
+    )
+    .click(hedgeTransPage.hedgeTransForm.find('#add_user_btn'));
+  // #month_year > option:nth-child(1)
+  await t
+    .expect(hedgeTransPage.transTable.visible)
+    .ok()
+    .expect(hedgeTransPage.transTable.find('tbody').count)
+    .eql(10);
 });

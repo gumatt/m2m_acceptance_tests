@@ -1,31 +1,31 @@
 import { Selector } from 'testcafe';
 
 import { getLocation } from './common'
-import { LOGIN_PAGE, HOME_PAGE } from './config';
+import { urls, user } from './config';
 import { LoginPage } from './pages';
 
 fixture `Simple Login Test`
-    .page`${LOGIN_PAGE}`;
+    .page`${urls.login}`;
 
 const page = new LoginPage();
 
 
 test('Login Success', async t => {
   await t
-    .typeText(page.usernameInput, 'atester')
-    .typeText(page.passwordInput, 'TeamLevine01')
+    .typeText(page.usernameInput, user.username)
+    .typeText(page.passwordInput, user.password)
     .click(page.submitButton);
 
-  await t.expect(getLocation()).eql(HOME_PAGE);
+  await t.expect(getLocation()).eql(urls.home);
 });
 
 test('Login Failure', async t => {
   await t
-    .typeText(page.usernameInput, 'atester')
-    .typeText(page.passwordInput, 'TeamLevine05')
+    .typeText(page.usernameInput, user.username)
+    .typeText(page.passwordInput, 'badPassword')
     .click(page.submitButton);
 
-  await t.expect(getLocation()).eql(LOGIN_PAGE);
+  await t.expect(getLocation()).eql(urls.login);
   await t.expect(page.flashMessage).visible;
-  await t.expect(page.flashMessage.innerText).contains('Invalid');
+  await t.expect(page.flashMessage.visible).ok();
 });
