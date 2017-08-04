@@ -2,7 +2,7 @@ import { Selector, ClientFunction } from 'testcafe';
 
 import { f, getLocation } from './common';
 import { urls, endpoints } from './config';
-import { HedgeTransPage } from './pages';
+import { HedgeTransPage, colIdx } from './pages';
 import { userRole as user } from './roles';
 import { simple_hedge_txn } from './transactions';
 
@@ -26,14 +26,28 @@ test('Open Hedge Trans Modal', async t => {
 });
 
 test('Row and Column Count', async t => {
+  console.log(
+    await hedgeTransPage.transTable.find('#users > thead > tr > th').textContent
+  );
+  const fields = await hedgeTransPage.transFields.getFieldMap();
+  const count = await hedgeTransPage.transData.find('tr').count;
+  console.log('count=' + count);
   await t
     .expect(hedgeTransPage.transTable.visible)
     .ok()
-    .expect(hedgeTransPage.transData.getCellText(8, 4))
-    .eql('Gasoline');
+    .expect(
+      hedgeTransPage.transData.getCellText(
+        await hedgeTransPage.transData.getTranNoIdx('findme'),
+        fields['Contract']
+      )
+    )
+    .eql('RBU2017');
 });
 
 test('Enter Simple Hedge Trans', async t => {
+  const init_count = await hedgeTransPage.transData.find('tr').count;
+
+  // enter simple heddge transaction
   await t
     .click(hedgeTransPage.createTransButton)
     .typeText(
@@ -113,10 +127,21 @@ test('Enter Simple Hedge Trans', async t => {
       { replace: true }
     )
     .click(hedgeTransPage.hedgeTransForm.find('#add_user_btn'));
-  // #month_year > option:nth-child(1)
+
+  // expect the transaction to be in the list with the correct values
+  const fields = await hedgeTransPage.transFields.getFieldMap();
   await t
     .expect(hedgeTransPage.transTable.visible)
     .ok()
-    .expect(hedgeTransPage.transTable.find('tbody').count)
-    .eql(10);
+    .expect(hedgeTransPage.transData.find('tr').count)
+    .eql(init_count + 1)
+    .expect(hedgeTransPage.transData.getTranNoIdx(simple_hedge_txn.name))
+    .gte(0)
+    .expect(
+      hedgeTransPage.transData.getCellText(
+        await hedgeTransPage.transData.getTranNoIdx(simple_hedge_txn.name),
+        fields['Price']
+      )
+    )
+    .eql(simple_hedge_txn.price.toString());
 });
