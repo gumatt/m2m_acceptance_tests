@@ -2,7 +2,7 @@ import { Role } from 'testcafe';
 
 import { urls } from '../config';
 import { user, admin } from '../data/users';
-import { LoginPage } from '../pages/pages';
+import { LoginPage } from '../pages';
 import { f } from '../helpers/common';
 
 const login = new LoginPage();

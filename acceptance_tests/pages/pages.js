@@ -3,65 +3,6 @@ import { Selector, ClientFunction } from 'testcafe';
 import { getLocation } from '../helpers/common';
 import { urls } from '../config';
 
-class LoginPageValidator {
-  constructor(controller) {
-    this.t = controller;
-    this.welcomeUsernameSpan = Selector(
-      '#topbar > div.pull-right.pull-right-head > div > div > span.admin-user-span2'
-    );
-    this._flashmessage = Selector('div.text-center');
-  }
-
-  async location(url) {
-    await this.t.expect(getLocation()).eql(url);
-  }
-
-  async welcomeUsername(username) {
-    await this.t.expect(this.welcomeUsernameSpan.innerText).eql(username);
-  }
-
-  async flashMessageIsVisible() {
-    await this.t.expect(this._flashmessage.visible).ok();
-  }
-
-  async flashMessageContains(message) {
-    await this.t.expect(this._flashmessage.innerText).contains(message);
-  }
-}
-
-class LoginPage {
-  constructor(validator) {
-    this.v = validator;
-    this.usernameInput = Selector('#id_username');
-    this.passwordInput = Selector('#id_password');
-    this.submitButton = Selector('button.btn');
-    this.flashMessage = Selector('div.text-center');
-  }
-
-  validate() {
-    return this.v;
-  }
-}
-
-const hedgeTransTableHeaders = Selector('#users > thead > tr');
-const colIdx = ClientFunction(
-  title => {
-    const titles = hedgeTransTableHeaders.cells;
-    var idx = -1;
-    var i;
-    for (i = 0; i < titles.length; i++) {
-      if (titles[idx].innerText === title) {
-        idx = i;
-        break;
-      }
-    }
-    return idx;
-  },
-  {
-    dependencies: { hedgeTransTableHeaders }
-  }
-);
-
 class HedgeTransPage {
   constructor() {
     this.createTransButton = Selector(
@@ -109,4 +50,4 @@ class HedgeTransPage {
   }
 }
 
-export { LoginPage, LoginPageValidator, HedgeTransPage, colIdx };
+export { HedgeTransPage };

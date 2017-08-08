@@ -1,5 +1,5 @@
 import { t, ClientFunction } from 'testcafe';
-import { LoginPage } from '../pages/pages';
+import { LoginPage } from '../pages';
 
 const getLocation = ClientFunction(() => document.location.href);
 
