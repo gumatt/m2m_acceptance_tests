@@ -1,10 +1,10 @@
 import { Selector, ClientFunction } from 'testcafe';
 
-import { f, getLocation } from './common';
-import { urls, endpoints } from './config';
-import { HedgeTransPage, colIdx } from './pages';
-import { userRole as user } from './roles';
-import { simple_hedge_txn } from './transactions';
+import { f, getLocation } from '../helpers/common';
+import { urls, endpoints } from '../config';
+import { HedgeTransPage, colIdx } from '../pages/pages';
+import { userRole as user } from '../helpers/roles';
+import { simple_hedge_txn } from '../data/hedge_transactions';
 
 const hedgeTransPage = new HedgeTransPage();
 user.preserveUrl = true;
@@ -25,10 +25,7 @@ test('Open Hedge Trans Modal', async t => {
   await t.expect(hedgeTransPage.hedgeTransModal.visible).ok();
 });
 
-test('Row and Column Count', async t => {
-  console.log(
-    await hedgeTransPage.transTable.find('#users > thead > tr > th').textContent
-  );
+test('Quick Test', async t => {
   const fields = await hedgeTransPage.transFields.getFieldMap();
   const count = await hedgeTransPage.transData.find('tr').count;
   console.log('count=' + count);
@@ -144,4 +141,6 @@ test('Enter Simple Hedge Trans', async t => {
       )
     )
     .eql(simple_hedge_txn.price.toString());
+}).after(async t => {
+  //  find new trasnaction and delete it
 });

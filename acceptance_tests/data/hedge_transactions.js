@@ -1,4 +1,4 @@
-import { cme_months } from './config';
+import { cme_months } from '../config';
 
 const curr_month = new Date().getMonth();
 const curr_year = new Date().getFullYear();
