@@ -10,6 +10,7 @@ class HedgeTransactionPageValidator {
   constructor(controller) {
     this.t = controller;
     this.transTable = Selector(selectors.Tables.TransTable.Table);
+    this.hedgeTransModal = Selector(selectors.Modals.HedgeTrans);
     this.transCountDisplay = Selector(
       selectors.Labels.countDisplay
     ).addCustomMethods({
@@ -54,6 +55,14 @@ class HedgeTransactionPageValidator {
         return myMap;
       }
     });
+  }
+
+  async addTransModalIsVisible() {
+    await this.t.expect(this.hedgeTransModal.visible).ok();
+  }
+
+  async location(url) {
+    await this.t.expect(getLocation()).eql(url);
   }
 
   async transCount(num) {

@@ -27,10 +27,7 @@ test('Refactor LoginPage Test', async t => {
 });
 
 test('Login Failure', async t => {
-  await t
-    .typeText(page.usernameInput, user.username)
-    .typeText(page.passwordInput, 'badPassword')
-    .click(page.submitButton);
+  await page.login(user.username, 'badPassword');
 
   await page.validate().location(urls.login);
   await page.validate().flashMessageIsVisible();
