@@ -1,16 +1,15 @@
-import { t, ClientFunction } from 'testcafe';
-import { LoginPage } from '../pages';
+import { ClientFunction } from 'testcafe';
+import { LoginPage, LoginPageMap, LoginPageValidator } from '../pages';
 
 const getLocation = ClientFunction(() => document.location.href);
 
-const login = new LoginPage();
+const map = new LoginPageMap();
+const validator = new LoginPageValidator(map)
+const page = new LoginPage(map, validator);
 
 var f = {
-  login: async function(t, username, password) {
-    await t
-      .typeText(login.usernameInput, username)
-      .typeText(login.passwordInput, password)
-      .click(login.submitButton);
+  login: async function(username, password) {
+    await page.login(username, password);
   }
 };
 

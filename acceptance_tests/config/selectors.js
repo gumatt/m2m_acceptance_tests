@@ -1,3 +1,17 @@
+const LOGIN_PAGE_SELECTORS = {
+  buttons: {
+    submit: 'button.btn', 
+  },
+  inputs: {
+    username: '#id_username',
+    password: '#id_password',
+  }, 
+  labels: {
+    flash_message: 'div.text-center',
+    welcome_username: '#topbar > div.pull-right.pull-right-head > div > div > span.admin-user-span2'
+  }
+}
+
 const HEDGE_TRANS_PAGE_SELECTORS = {
   Buttons: {
     CreateHedgeTrans:
@@ -43,4 +57,4 @@ const HEDGE_TRANS_PAGE_SELECTORS = {
   }
 };
 
-export { HEDGE_TRANS_PAGE_SELECTORS };
+export { HEDGE_TRANS_PAGE_SELECTORS, LOGIN_PAGE_SELECTORS };

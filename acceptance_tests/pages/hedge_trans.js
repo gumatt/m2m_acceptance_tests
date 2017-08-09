@@ -6,11 +6,12 @@ import { urls } from '../config';
 
 const selectors = HEDGE_TRANS_PAGE_SELECTORS;
 
-class HedgeTransactionPageValidator {
-  constructor(controller) {
-    this.t = controller;
+class HedgeTransactionPageMap {
+  constructor() {
+    this.createTransButton = Selector(selectors.Buttons.CreateHedgeTrans);
     this.transTable = Selector(selectors.Tables.TransTable.Table);
     this.hedgeTransModal = Selector(selectors.Modals.HedgeTrans);
+    this.hedgeTransForm = Selector(selectors.Forms.HedgeTrans.Form);
     this.transCountDisplay = Selector(
       selectors.Labels.countDisplay
     ).addCustomMethods({
@@ -54,11 +55,18 @@ class HedgeTransactionPageValidator {
         }
         return myMap;
       }
-    });
+    });    
+  }
+}
+
+class HedgeTransactionPageValidator {
+  constructor(map) {
+    this.t = t;
+    this.m = map;
   }
 
   async addTransModalIsVisible() {
-    await this.t.expect(this.hedgeTransModal.visible).ok();
+    await this.t.expect(this.m.hedgeTransModal.visible).ok();
   }
 
   async location(url) {
@@ -66,7 +74,7 @@ class HedgeTransactionPageValidator {
   }
 
   async transCount(num) {
-    const countText = await this.transCountDisplay.innerText;
+    const countText = await this.m.transCountDisplay.innerText;
     const countTokens = countText.split(" ");
     const count = parseInt(countTokens[countTokens.length - 2]);
     await this.t
@@ -75,18 +83,18 @@ class HedgeTransactionPageValidator {
   }
 
   async transTableIsVisible() {
-    await this.t.expect(this.transTable.visible).ok();
+    await this.t.expect(this.m.transTable.visible).ok();
   }
 
   async transNoExists(transNo) {
-    await this.t.expect(this.transData.getTransNoIdx(transNo)).gte(0);
+    await this.t.expect(this.m.transData.getTransNoIdx(transNo)).gte(0);
   }
 
   async transPrice(transNo, price) {
     await this.t
       .expect(
-        this.transData.getCellText(
-          await this.transData.getTranNoIdx(tranNo),
+        this.m.transData.getCellText(
+          await this.m.transData.getTranNoIdx(tranNo),
           this.fields['Price']
         )
       )
@@ -95,15 +103,15 @@ class HedgeTransactionPageValidator {
 
   async transNoAppears(transNo) {
     await this.t.expect(
-      this.transData.getTranNoIdx(transNo)
+      this.m.transData.getTranNoIdx(transNo)
     ).gte(0);
   }
 
   async transNoHasPrice(transNo, price) {
-    const fields = await this.transFields.getFieldMap();
+    const fields = await this.m.transFields.getFieldMap();
     await this.t.expect(
-      this.transData.getCellText(
-        await this.transData.getTranNoIdx(transNo),
+      this.m.transData.getCellText(
+        await this.m.transData.getTranNoIdx(transNo),
         fields['Price']
       )
     ).eql(price.toString());
@@ -111,94 +119,84 @@ class HedgeTransactionPageValidator {
 }
 
 class HedgeTransactionPage {
-  constructor(validator) {
+  constructor(map, validator) {
+    this.t = t;
     this.v = validator;
-    this.createTransButton = Selector(selectors.Buttons.CreateHedgeTrans);
-    this.hedgeTransModal = Selector(selectors.Modals.HedgeTrans);
-    this.hedgeTransForm = Selector(selectors.Forms.HedgeTrans.Form);
-    this.transTable = Selector(selectors.Tables.TransTable.Table);
-    this.transCountDisplay = Selector(
-      selectors.Labels.countDisplay
-    ).addCustomMethods({
-      count: label => {
-        return label.innerText.replace(/.*\D/g, '');
-      }
-    });
-    this.transData = Selector(
-      selectors.Tables.TransTable.Rows
-    ).addCustomMethods({
-      getCellText: (table, rowIndex, columnIndex) => {
-        return table.rows[rowIndex].cells[columnIndex].innerText;
-      },
-      getRowCount: table => {
-        return table.rows.length;
-      },
-      getTranNoIdx: (table, tranNo) => {
-        for (var i = 0; i < table.rows.length; i++) {
-          if (table.rows[i].cells[2].innerText.indexOf(tranNo) !== -1) {
-            return i;
-          }
-        }
-        return -1;
-      }
-    });
-    this.transFields = Selector(
-      selectors.Tables.TransTable.Columns
-    ).addCustomMethods({
-      getFieldIdx: (fields, fieldName) => {
-        for (var i = 0; i < fields.children.length; i++) {
-          if (fields.children[i].innerText.indexOf(fieldName) !== -1) {
-            return i;
-          }
-        }
-        return -1;
-      },
-      getFieldMap: fields => {
-        var myMap = {};
-        for (var i = 0; i < fields.children.length; i++) {
-          myMap[fields.children[i].innerText || 'checkbox'] = i;
-        }
-        return myMap;
-      }
-    });
+    this.m = map;
   }
 
   async transCount() {
-    const displayText = await this.transCountDisplay.innerText;
+    const displayText = await this.m.transCountDisplay.innerText;
     const tokens = displayText.split(" ");
     return parseInt(tokens[tokens.length - 2]);
+  }
+
+  async openTransModal() {
+    await this.t.click(this.m.createTransButton);
+  }
+
+  async openEditModal(txnID) {
+    const txnIdx = await this.m.transData.getTranNoIdx(txnID);
+    // const rows = await this.m.transData.child('tr');  //#users > tbody > tr:nth-child(3) > td:nth-child(3)
+    await this.t
+      .click(this.m.transData.child('tr').nth(txnIdx).find('a'))    
+  }
+
+  async modifyTransPrice( txnID, price ) {
+    const fields = selectors.Forms.HedgeTrans.Fields;
+    const txnIdx = await this.m.transData.getTranNoIdx(txnID);
+    const rows = await this.m.transData.child('tr');  //#users > tbody > tr:nth-child(3) > td:nth-child(3)
+    await this.t
+      .click(rows.nth(txnIdx).find('a'))
+      .typeText(
+        this.m.hedgeTransForm.find(fields.TransPrice),
+        price.toString()
+      )
+      .click(this.m.hedgeTransForm.find(fields.SubmitBtn));
+  }
+
+  async updatePriceInput(price) {
+    const fields = selectors.Forms.HedgeTrans.Fields;
+    await this.t
+      .typeText(this.m.hedgeTransForm.find(fields.TransPrice), price.toString(), {replace: true});
+  }
+
+  async clickSubmit() {
+    const fields = selectors.Forms.HedgeTrans.Fields;
+    await this.t
+      .click(this.m.hedgeTransForm.find(fields.SubmitBtn));
   }
 
   async addTransaction(trans) {
     const fields = selectors.Forms.HedgeTrans.Fields;
 
     await t
-      .click(this.createTransButton)
-      .typeText(this.hedgeTransForm.find(fields.TransNo), trans.name)
-      .click(this.hedgeTransForm.find(fields.TransType))
+      .click(this.m.createTransButton)
+      .typeText(this.m.hedgeTransForm.find(fields.TransNo), trans.name)
+      .click(this.m.hedgeTransForm.find(fields.TransType))
       .click(
         Selector(fields.TransType + ' > option').withText(
           trans.hedge_trans_type
         )
       )
-      .click(this.hedgeTransForm.find(fields.HedgeAccount))
+      .click(this.m.hedgeTransForm.find(fields.HedgeAccount))
       .click(
         Selector(fields.HedgeAccount + ' > option').withText(
           trans.hedge_account
         )
       )
-      .click(this.hedgeTransForm.find(fields.Program))
+      .click(this.m.hedgeTransForm.find(fields.Program))
       .click(Selector(fields.Program + ' > option').withText(trans.inventory))
-      .click(this.hedgeTransForm.find(fields.Product))
+      .click(this.m.hedgeTransForm.find(fields.Product))
       .click(Selector(fields.Product + ' > option').withText(trans.product))
-      .click(this.hedgeTransForm.find(fields.Contract))
+      .click(this.m.hedgeTransForm.find(fields.Contract))
       .click(
         Selector(fields.Contract + ' > option').withAttribute(
           'value',
           trans.contract_entry
         )
       )
-      .click(this.hedgeTransForm.find(fields.MonthYear))
+      .click(this.m.hedgeTransForm.find(fields.MonthYear))
       .click(
         Selector(fields.MonthYear + ' > option').withAttribute(
           'value',
@@ -206,17 +204,17 @@ class HedgeTransactionPage {
         )
       )
       .typeText(
-        this.hedgeTransForm.find(fields.Volume),
+        this.m.hedgeTransForm.find(fields.Volume),
         trans.volume.toString()
       )
       .typeText(
-        this.hedgeTransForm.find(fields.TransPrice),
+        this.m.hedgeTransForm.find(fields.TransPrice),
         trans.price.toString()
       )
-      .typeText(this.hedgeTransForm.find(fields.TransDate), trans.trans_date, {
+      .typeText(this.m.hedgeTransForm.find(fields.TransDate), trans.trans_date, {
         replace: true
       })
-      .click(this.hedgeTransForm.find(fields.InitialPosition))
+      .click(this.m.hedgeTransForm.find(fields.InitialPosition))
       .click(
         Selector(fields.InitialPosition + ' > option').withAttribute(
           'value',
@@ -224,24 +222,24 @@ class HedgeTransactionPage {
         )
       )
       .typeText(
-        this.hedgeTransForm.find(fields.ConfirmationNumber),
+        this.m.hedgeTransForm.find(fields.ConfirmationNumber),
         trans.confirm_number,
         { replace: true }
       )
-      .typeText(this.hedgeTransForm.find(fields.Trader), trans.trader, {
+      .typeText(this.m.hedgeTransForm.find(fields.Trader), trans.trader, {
         replace: true
       })
-      .click(this.hedgeTransForm.find(fields.Status))
+      .click(this.m.hedgeTransForm.find(fields.Status))
       .click(
         Selector(fields.Status + ' > option').withAttribute(
           'value',
           trans.status.toLowerCase()
         )
       )
-      .typeText(this.hedgeTransForm.find(fields.Inventory), trans.program, {
+      .typeText(this.m.hedgeTransForm.find(fields.Inventory), trans.program, {
         replace: true
       })
-      .click(this.hedgeTransForm.find(fields.SubmitBtn));
+      .click(this.m.hedgeTransForm.find(fields.SubmitBtn));
   }
 
   validate() {
@@ -249,4 +247,4 @@ class HedgeTransactionPage {
   }
 }
 
-export { HedgeTransactionPage, HedgeTransactionPageValidator };
+export { HedgeTransactionPage, HedgeTransactionPageValidator, HedgeTransactionPageMap };

@@ -1,14 +1,25 @@
-import { Selector } from 'testcafe';
+import { Selector, t } from 'testcafe';
 
 import { getLocation } from '../helpers/common';
+import { LOGIN_PAGE_SELECTORS } from '../config/selectors';
+
+class LoginPageMap {
+  constructor() {
+    this.usernameInput = Selector(LOGIN_PAGE_SELECTORS.inputs.username);
+    this.passwordInput = Selector(LOGIN_PAGE_SELECTORS.inputs.password);
+    this.submitButton = Selector(LOGIN_PAGE_SELECTORS.buttons.submit);
+    this.flashMessage = Selector(LOGIN_PAGE_SELECTORS.labels.flash_message);
+    this.welcomeUsernameSpan = Selector(
+      LOGIN_PAGE_SELECTORS.labels.welcome_username
+    );
+    this._flashmessage = Selector(LOGIN_PAGE_SELECTORS.labels.flash_message);
+  }
+}
 
 class LoginPageValidator {
-  constructor(controller) {
-    this.t = controller;
-    this.welcomeUsernameSpan = Selector(
-      '#topbar > div.pull-right.pull-right-head > div > div > span.admin-user-span2'
-    );
-    this._flashmessage = Selector('div.text-center');
+  constructor(map) {
+    this.t = t;
+    this.m = map;
   }
 
   async location(url) {
@@ -16,33 +27,30 @@ class LoginPageValidator {
   }
 
   async welcomeUsername(username) {
-    await this.t.expect(this.welcomeUsernameSpan.innerText).eql(username);
+    await this.t.expect(this.m.welcomeUsernameSpan.innerText).eql(username);
   }
 
   async flashMessageIsVisible() {
-    await this.t.expect(this._flashmessage.visible).ok();
+    await this.t.expect(this.m._flashmessage.visible).ok();
   }
 
   async flashMessageContains(message) {
-    await this.t.expect(this._flashmessage.innerText).contains(message);
+    await this.t.expect(this.m._flashmessage.innerText).contains(message);
   }
 }
 
 class LoginPage {
-  constructor(t, validator) {
+  constructor(map, validator) {
     this.t = t;
+    this.m = map;
     this.v = validator;
-    this.usernameInput = Selector('#id_username');
-    this.passwordInput = Selector('#id_password');
-    this.submitButton = Selector('button.btn');
-    this.flashMessage = Selector('div.text-center');
   }
 
   async login(username, password) {
     await this.t
-      .typeText(this.usernameInput, username)
-      .typeText(this.passwordInput, password)
-      .click(this.submitButton);
+      .typeText(this.m.usernameInput, username)
+      .typeText(this.m.passwordInput, password)
+      .click(this.m.submitButton);
   }
 
   validate() {
@@ -50,4 +58,4 @@ class LoginPage {
   }
 }
 
-export { LoginPage, LoginPageValidator };
+export { LoginPage, LoginPageValidator, LoginPageMap };

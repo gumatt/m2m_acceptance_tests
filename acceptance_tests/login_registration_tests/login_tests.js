@@ -1,32 +1,22 @@
-import { Selector, t } from 'testcafe';
 
 import { getLocation } from '../helpers/common';
 import { urls } from '../config';
 import { user } from '../data/users';
-import { LoginPage, LoginPageValidator } from '../pages';
+import { LoginPage, LoginPageValidator, LoginPageMap } from '../pages';
 
 fixture`Simple Login Test`.page`${urls.login}`;
 
-const validator = new LoginPageValidator(t);
-const page = new LoginPage(t, validator);
+const map = new LoginPageMap();
+const validator = new LoginPageValidator(map);
+const page = new LoginPage(map, validator);
 
-test('Login Success', async t => {
-  await t
-    .typeText(page.usernameInput, user.username)
-    .typeText(page.passwordInput, user.password)
-    .click(page.submitButton);
-
-  await page.validate().location(urls.home);
-  await page.validate().welcomeUsername(user.username);
-});
-
-test('Refactor LoginPage Test', async t => {
+test('Refactor LoginPage Test', async () => {
   await page.login(user.username, user.password);
   await page.validate().location(urls.home);
   await page.validate().welcomeUsername(user.username);
 });
 
-test('Login Failure', async t => {
+test('Login Failure', async () => {
   await page.login(user.username, 'badPassword');
 
   await page.validate().location(urls.login);
