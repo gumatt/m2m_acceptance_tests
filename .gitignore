@@ -1,6 +1,9 @@
 # OSX 
 .DS_Store
 
+# IDE, Editor files
+.vscode/
+
 # Logs
 logs
 *.log
