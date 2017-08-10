@@ -9,6 +9,9 @@ const LOGIN_PAGE_SELECTORS = {
   labels: {
     flash_message: 'div.text-center',
     welcome_username: '#topbar > div.pull-right.pull-right-head > div > div > span.admin-user-span2'
+  },
+  Modals: {
+    flashAlert: 'body > div.bootbox.modal.fade.bootbox-alert.in > div'
   }
 }
 

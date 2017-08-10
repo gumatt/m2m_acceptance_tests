@@ -23,3 +23,10 @@ test('Login Failure', async () => {
   await page.validate().flashMessageIsVisible();
   await page.validate().flashMessageContains('Invalid username or password');
 });
+
+test('Card SOW5#30 LoginPage Test', async () => {
+  await page.login(user.username, user.password);
+  await page.validate().location(urls.home);
+  await page.validate().welcomeUsername(user.username);
+  await page.validate().noAlert();
+});

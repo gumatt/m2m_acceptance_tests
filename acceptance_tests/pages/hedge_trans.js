@@ -57,6 +57,14 @@ class HedgeTransactionPageMap {
       }
     });    
   }
+
+  async getDataCell(rowIdx, colIdx) {
+    const rows = await this.transData.child('tr');
+    const row = rows.nth(rowIdx).child('td');
+    const cell = row.nth(colIdx);
+    return cell;
+
+  }
 }
 
 class HedgeTransactionPageValidator {
@@ -123,6 +131,12 @@ class HedgeTransactionPage {
     this.t = t;
     this.v = validator;
     this.m = map;
+  }
+
+  async navigateToAs(user) {
+    await this.t
+      .useRole(user)
+      .navigateTo(urls.hedge_txn_log);
   }
 
   async transCount() {

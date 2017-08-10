@@ -9,6 +9,7 @@ class LoginPageMap {
     this.passwordInput = Selector(LOGIN_PAGE_SELECTORS.inputs.password);
     this.submitButton = Selector(LOGIN_PAGE_SELECTORS.buttons.submit);
     this.flashMessage = Selector(LOGIN_PAGE_SELECTORS.labels.flash_message);
+    this.flashAlertModal = Selector(LOGIN_PAGE_SELECTORS.Modals.flashAlert);
     this.welcomeUsernameSpan = Selector(
       LOGIN_PAGE_SELECTORS.labels.welcome_username
     );
@@ -36,6 +37,10 @@ class LoginPageValidator {
 
   async flashMessageContains(message) {
     await this.t.expect(this.m._flashmessage.innerText).contains(message);
+  }
+
+  async noAlert() {
+    await this.t.expect(this.m.flashAlertModal.visible).notOk();
   }
 }
 

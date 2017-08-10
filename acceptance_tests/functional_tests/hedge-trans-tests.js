@@ -1,3 +1,5 @@
+// TODO:  remove new transactions after each test
+
 import { t } from 'testcafe';
 
 import { getLocation } from '../helpers/common';
