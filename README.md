@@ -27,3 +27,10 @@ testcafe [browser_list] **/*tests.js
 ```
 
 other command line options are available in the [cli docs for testcafe](https://devexpress.github.io/testcafe/documentation/using-testcafe/command-line-interface.html#-t-pattern---test-grep-pattern)
+
+### Running Tests for Specific Issues
+I use the Trello extension for Chrome that reveals the ID numbers on the cards.  I will use the SOW number for the Trello board and the card ID for tests for given cards.  These can be run individually with the command (e.g. the tests for SOW5 board, card #30 can be run with)
+
+```
+testcafe Chrome **/*tests.js -T "SOW5.30"
+```
