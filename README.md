@@ -27,5 +27,3 @@ testcafe [browser_list] **/*tests.js
 ```
 
 other command line options are available in the [cli docs for testcafe](https://devexpress.github.io/testcafe/documentation/using-testcafe/command-line-interface.html#-t-pattern---test-grep-pattern)
-
-body > div.bootbox.modal.fade.bootbox-alert.in > div
