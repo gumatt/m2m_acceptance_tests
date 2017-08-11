@@ -40,7 +40,7 @@ class LoginPageValidator {
   }
 
   async noAlert() {
-    await this.t.expect(this.m.flashAlertModal.visible).notOk();
+    await this.t.expect(this.m.flashAlertModal.exists).notOk();
   }
 }
 
