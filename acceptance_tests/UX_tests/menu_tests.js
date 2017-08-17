@@ -1,24 +1,18 @@
-import { t } from 'testcafe';
-
 import { getLocation } from '../helpers/common';
 import { urls } from '../config';
 import {
   DashboardPage,
   DashboardPageValidator,
-  DashboardPageMap,
-  HedgeTransactionPage
+  DashboardPageMap
 } from '../pages';
 import { userRole as user } from '../helpers/roles';
-import { simple_hedge_txn } from '../data/hedge_transactions';
-
-import { TEMPLATE_SELECTORS } from '../config/selectors';
 
 const map = new DashboardPageMap();
 const validator = new DashboardPageValidator(map);
 const page = new DashboardPage(urls.dashboard, map, validator);
 
 fixture`Nav Menu UI Tests`
-  .page`${urls.home}`.beforeEach(async () => {
+  .page`${urls.dashboard}`.beforeEach(async () => {
   await page.navigateToAs(user);
 });
 
