@@ -8,7 +8,7 @@ import {
   HedgeTransactionPage,
   HedgeTransactionPageValidator,
   HedgeTransactionPageMap
-} from '../pages/hedge_trans';
+} from '../pages';
 import { userRole as user } from '../helpers/roles';
 import { simple_hedge_txn } from '../data/hedge_transactions';
 
@@ -45,7 +45,7 @@ test('Enter Simple Hedge Trans', async () => {
     .transNoHasPrice(simple_hedge_txn.name, simple_hedge_txn.price);
 });
 
-test('Modify Hedge Trans - Card #28', async () => {
+test('Modify Hedge Trans', async () => {
   await page.addTransaction(simple_hedge_txn);
 
   await page.openEditModal(simple_hedge_txn.name);

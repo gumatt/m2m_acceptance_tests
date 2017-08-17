@@ -1,12 +1,12 @@
 import { t } from 'testcafe';
 
 import { getLocation } from '../helpers/common';
-import { urls } from '../config';
+import { urls, HEDGE_TRANS_PAGE_LABELS as labels } from '../config';
 import {
   HedgeTransactionPage,
   HedgeTransactionPageValidator,
   HedgeTransactionPageMap
-} from '../pages/hedge_trans';
+} from '../pages';
 import { userRole as user } from '../helpers/roles';
 import { simple_hedge_txn } from '../data/hedge_transactions';
 
@@ -21,10 +21,12 @@ fixture`Hedge Log UX Tests`
 
 test('num fields right justified', async () => {
   await page.validate().transTableIsVisible();
-  const cellEl = await page.m.getDataCell(1, 8);
-  const cellStyle = await cellEl.style;
-  await t.expect(cellStyle['text-align']).eql('right');
-});
+  const colIdx = await page.m.transFields.getFieldIdx(labels.transData.fields.volume);
+  const rowIdx = 1;
+  const cell = await page.m.getDataCell(rowIdx, colIdx);
+
+  await page.validate().elementStyle(cell, 'text-align', 'right')
+})
 
 // TODO-DONE:  see if I can make hedge_trans page emit element where I can check a css style value
 // TODO:  create a style(el, prop, value) validator as part of M2MBaseValidator

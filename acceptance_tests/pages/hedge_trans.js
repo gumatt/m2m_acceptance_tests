@@ -12,6 +12,7 @@ class HedgeTransactionPageMap {
     this.transTable = Selector(selectors.Tables.TransTable.Table);
     this.hedgeTransModal = Selector(selectors.Modals.HedgeTrans);
     this.hedgeTransForm = Selector(selectors.Forms.HedgeTrans.Form);
+    this.transPriceInput = Selector(selectors.Forms.HedgeTrans.Fields.TransPrice);
     this.transCountDisplay = Selector(
       selectors.Labels.countDisplay
     ).addCustomMethods({
@@ -35,6 +36,12 @@ class HedgeTransactionPageMap {
           }
         }
         return -1;
+      },
+      getCellText: (table, rowIdx, colIdx) => {
+        return table.rows[rowIdx].cells[colIdx].innerText;
+      },
+      getCellStyle: (table, rowIdx, colIdx) => {
+        return table.rows[rowIdx].cells[colIdx].style;
       }
     });
     this.transFields = Selector(
@@ -71,6 +78,10 @@ class HedgeTransactionPageValidator {
   constructor(map) {
     this.t = t;
     this.m = map;
+  }
+
+  async elementStyle(el, attrib, value) {
+    await this.t.expect(el.getStyleProperty(attrib)).eql(value);
   }
 
   async addTransModalIsVisible() {
@@ -171,8 +182,11 @@ class HedgeTransactionPage {
 
   async updatePriceInput(price) {
     const fields = selectors.Forms.HedgeTrans.Fields;
+    const newPrice = price.toString();
+    await this.t.click(this.m.transPriceInput);
+    await this.t.selectText(this.m.transPriceInput);
     await this.t
-      .typeText(this.m.hedgeTransForm.find(fields.TransPrice), price.toString(), {replace: true});
+      .typeText(this.m.transPriceInput, newPrice, {replace: true});
   }
 
   async clickSubmit() {
