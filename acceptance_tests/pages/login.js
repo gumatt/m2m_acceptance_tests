@@ -2,6 +2,7 @@ import { Selector, t } from 'testcafe';
 
 import { getLocation } from '../helpers/common';
 import { LOGIN_PAGE_SELECTORS } from '../config/selectors';
+import { BaseValidator, BasePage } from './base';
 
 class LoginPageMap {
   constructor() {
@@ -17,14 +18,9 @@ class LoginPageMap {
   }
 }
 
-class LoginPageValidator {
+class LoginPageValidator extends BaseValidator {
   constructor(map) {
-    this.t = t;
-    this.m = map;
-  }
-
-  async location(url) {
-    await this.t.expect(getLocation()).eql(url);
+    super(map)
   }
 
   async welcomeUsername(username) {
@@ -44,11 +40,9 @@ class LoginPageValidator {
   }
 }
 
-class LoginPage {
-  constructor(map, validator) {
-    this.t = t;
-    this.m = map;
-    this.v = validator;
+class LoginPage extends BasePage {
+  constructor(url, map, validator) {
+    super(url, map, validator)
   }
 
   async login(username, password) {
@@ -56,10 +50,6 @@ class LoginPage {
       .typeText(this.m.usernameInput, username)
       .typeText(this.m.passwordInput, password)
       .click(this.m.submitButton);
-  }
-
-  validate() {
-    return this.v;
   }
 }
 

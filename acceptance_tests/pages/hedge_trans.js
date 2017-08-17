@@ -2,6 +2,7 @@ import { Selector, t } from 'testcafe';
 
 import { getLocation } from '../helpers/common';
 import { HEDGE_TRANS_PAGE_SELECTORS } from '../config/selectors';
+import { BaseValidator, BasePage } from './base';
 import { urls } from '../config';
 
 const selectors = HEDGE_TRANS_PAGE_SELECTORS;
@@ -74,22 +75,13 @@ class HedgeTransactionPageMap {
   }
 }
 
-class HedgeTransactionPageValidator {
+class HedgeTransactionPageValidator extends BaseValidator {
   constructor(map) {
-    this.t = t;
-    this.m = map;
-  }
-
-  async elementStyle(el, attrib, value) {
-    await this.t.expect(el.getStyleProperty(attrib)).eql(value);
+    super(map)
   }
 
   async addTransModalIsVisible() {
     await this.t.expect(this.m.hedgeTransModal.visible).ok();
-  }
-
-  async location(url) {
-    await this.t.expect(getLocation()).eql(url);
   }
 
   async transCount(num) {
@@ -137,17 +129,9 @@ class HedgeTransactionPageValidator {
   }
 }
 
-class HedgeTransactionPage {
-  constructor(map, validator) {
-    this.t = t;
-    this.v = validator;
-    this.m = map;
-  }
-
-  async navigateToAs(user) {
-    await this.t
-      .useRole(user)
-      .navigateTo(urls.hedge_txn_log);
+class HedgeTransactionPage extends BasePage {
+  constructor(url, map, validator) {
+    super(url, map, validator)
   }
 
   async transCount() {
@@ -268,10 +252,6 @@ class HedgeTransactionPage {
         replace: true
       })
       .click(this.m.hedgeTransForm.find(fields.SubmitBtn));
-  }
-
-  validate() {
-    return this.v;
   }
 }
 

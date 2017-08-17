@@ -12,7 +12,7 @@ import { simple_hedge_txn } from '../data/hedge_transactions';
 
 const map = new HedgeTransactionPageMap();
 const validator = new HedgeTransactionPageValidator(map);
-const page = new HedgeTransactionPage(map, validator);
+const page = new HedgeTransactionPage(urls.hedge_txn_log, map, validator);
 
 fixture`Hedge Log UX Tests`
   .page`${urls.hedge_txn_log}`.beforeEach(async () => {

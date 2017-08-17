@@ -8,7 +8,7 @@ fixture`Simple Login Test`.page`${urls.login}`;
 
 const map = new LoginPageMap();
 const validator = new LoginPageValidator(map);
-const page = new LoginPage(map, validator);
+const page = new LoginPage(urls.login, map, validator);
 
 test('Refactor LoginPage Test', async () => {
   await page.login(user.username, user.password);

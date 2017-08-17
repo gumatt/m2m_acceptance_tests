@@ -14,12 +14,11 @@ import { simple_hedge_txn } from '../data/hedge_transactions';
 
 const map = new HedgeTransactionPageMap();
 const validator = new HedgeTransactionPageValidator(map);
-const page = new HedgeTransactionPage(map, validator);
-user.preserveUrl = false;
+const page = new HedgeTransactionPage(urls.hedge_txn_log, map, validator);
 
 fixture`Enter Hedge Transaction`
   .page`${urls.hedge_txn_log}`.beforeEach(async () => {
-  await t.useRole(user).navigateTo(urls.hedge_txn_log);
+  await page.navigateToAs(user);
 });
 
 test('Hedge Transaction Log Exists', async () => {
