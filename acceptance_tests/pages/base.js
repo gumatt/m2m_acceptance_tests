@@ -11,6 +11,10 @@ class BaseValidator {
     await this.t.expect(el.getStyleProperty(attrib)).eql(value);
   }
 
+  async isVisible(selector) {
+    await this.t.expect(selector.visible).ok();
+  }
+
   async location(url) {
     await this.t.expect(getLocation()).eql(url);
   }

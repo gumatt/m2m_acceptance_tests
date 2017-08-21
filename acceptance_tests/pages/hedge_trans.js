@@ -10,6 +10,14 @@ const selectors = HEDGE_TRANS_PAGE_SELECTORS;
 class HedgeTransactionPageMap {
   constructor() {
     this.createTransButton = Selector(selectors.Buttons.CreateHedgeTrans);
+    this.deleteTransButton = Selector(selectors.Buttons.DeleteTransaction);
+    this.deleteConfirmButton = Selector(selectors.Buttons.DeleteTransConfirm);
+    this.deleteConfirmSuccess = Selector(selectors.Buttons.ConfirmSuccess);
+    this.uploadTransModalButton = Selector(selectors.Buttons.UploadTrans);
+    this.uploadTransForm = Selector(selectors.Forms.HedgeTransUpload.Form);
+    this.browseFilesButton = Selector(selectors.Buttons.BrowseFiles);
+    this.uploadFilesButton = Selector(selectors.Buttons.UploadFiles);
+    this.uploadFilesInput = Selector(selectors.Forms.HedgeTransUpload.Fields.filesInput);
     this.transTable = Selector(selectors.Tables.TransTable.Table);
     this.hedgeTransModal = Selector(selectors.Modals.HedgeTrans);
     this.hedgeTransForm = Selector(selectors.Forms.HedgeTrans.Form);
@@ -97,6 +105,10 @@ class HedgeTransactionPageValidator extends BaseValidator {
     await this.t.expect(this.m.transTable.visible).ok();
   }
 
+  async uploadTransModalIsVisible() {
+    await this.t.expect(this.m.uploadTransForm.visible).ok();
+  }
+
   async transNoExists(transNo) {
     await this.t.expect(this.m.transData.getTransNoIdx(transNo)).gte(0);
   }
@@ -144,6 +156,10 @@ class HedgeTransactionPage extends BasePage {
     await this.t.click(this.m.createTransButton);
   }
 
+  async openUploadModal() {
+    await this.t.click(this.m.uploadTransModalButton);
+  }
+
   async openEditModal(txnID) {
     const txnIdx = await this.m.transData.getTranNoIdx(txnID);
     // const rows = await this.m.transData.child('tr');  //#users > tbody > tr:nth-child(3) > td:nth-child(3)
@@ -164,6 +180,10 @@ class HedgeTransactionPage extends BasePage {
       .click(this.m.hedgeTransForm.find(fields.SubmitBtn));
   }
 
+  async selectFilesToUpload(files) {
+    await this.t.setFilesToUpload(this.m.uploadFilesInput ,files);
+  }
+
   async updatePriceInput(price) {
     const fields = selectors.Forms.HedgeTrans.Fields;
     const newPrice = price.toString();
@@ -171,6 +191,11 @@ class HedgeTransactionPage extends BasePage {
     await this.t.selectText(this.m.transPriceInput);
     await this.t
       .typeText(this.m.transPriceInput, newPrice, {replace: true});
+  }
+
+  async uploadFiles(files) {
+    await this.selectFilesToUpload(files);
+    await this.t.click(this.m.uploadFilesButton);
   }
 
   async clickSubmit() {
@@ -252,6 +277,20 @@ class HedgeTransactionPage extends BasePage {
         replace: true
       })
       .click(this.m.hedgeTransForm.find(fields.SubmitBtn));
+  }
+
+  async removeTransaction(trans) {
+    const txnIdx = await this.m.transData.getTranNoIdx(trans.name);
+    await removeNthTransaction(txnIdx);
+  }
+
+  async removeNthTransaction(idx) {
+    const rows = await this.m.transData.child('tr');
+    await this.t
+      .click(rows.nth(idx).find('.select-checkbox'))
+      .click(this.m.deleteTransButton)
+      .click(this.m.deleteConfirmButton)
+      .click(this.m.deleteConfirmSuccess)
   }
 }
 

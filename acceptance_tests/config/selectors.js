@@ -50,7 +50,15 @@ const LOGIN_PAGE_SELECTORS = {
 const HEDGE_TRANS_PAGE_SELECTORS = {
   Buttons: {
     CreateHedgeTrans:
-      '#main-content > div.content-body > div > div > div.box-head.clearfix > div > a:nth-child(2)'
+      '#main-content > div.content-body > div > div > div.box-head.clearfix > div > a:nth-child(2)',
+    DeleteTransaction: '#delete_hedge_tran',
+    DeleteTransConfirm: '#confirm',
+    ConfirmSuccess: '#ok',
+    UploadTrans: 
+      '#main-content > div.content-body > div > div > div.box-head.clearfix > div > a:nth-child(1)',
+    BrowseFiles: '#UploadFileForm > div.modal-body.clearfix > div > div.input-group.file-caption-main > div.input-group-btn > div',
+    UploadFiles: 
+      '#UploadFileForm > div.modal-body > div > div.input-group.file-caption-main > div.input-group-btn > button.btn.btn-default.fileinput-upload.fileinput-upload-button'
   },
   Modals: {
     HedgeTrans: '#add-hedge-tran'
@@ -77,6 +85,14 @@ const HEDGE_TRANS_PAGE_SELECTORS = {
         SubmitBtn: '#add_user_btn',
         CancelBtn:
           '#hedge_tran_info > div.modal-footer > button.btn.btn-default'
+      }
+    },
+    HedgeTransUpload: {
+      Form: '#UploadFileForm',
+      Fields: {
+        filePath: 
+          '#UploadFileForm > div.modal-body.clearfix > div > div.input-group.file-caption-main > div.form-control.file-caption.kv-fileinput-caption',
+        filesInput: '#file_upload'
       }
     }
   },
