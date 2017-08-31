@@ -1,6 +1,4 @@
-// TODO:  remove new transactions after each test
-
-import { t } from 'testcafe';
+// hedge transactions tests entered manually and with csv upload
 
 import { getLocation } from '../helpers/common';
 import { urls } from '../config';

@@ -12,4 +12,4 @@ const adminRole = Role(urls.login, async t => {
   await f.login(adminUser.username, admin.password);
 });
 
-export { userRole, adminRole };
+export { userRole, adminRole, user, admin };

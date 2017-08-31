@@ -281,7 +281,7 @@ class HedgeTransactionPage extends BasePage {
 
   async removeTransaction(trans) {
     const txnIdx = await this.m.transData.getTranNoIdx(trans.name);
-    await removeNthTransaction(txnIdx);
+    await this.removeNthTransaction(txnIdx);
   }
 
   async removeNthTransaction(idx) {
