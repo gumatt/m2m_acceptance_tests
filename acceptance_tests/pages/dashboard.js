@@ -29,14 +29,24 @@ class DashboardPageMap {
     
     // Overview tables
     this.programsTable = {
-      element: Selector(DASHBOARD_SELECTORS.tables.programs),
+      element: Selector(DASHBOARD_SELECTORS.tables.programs.table),
       filters: {
         programFilter: {
           element: Selector(DASHBOARD_SELECTORS.filters.programs.programFilter),
           options: Selector(DASHBOARD_SELECTORS.filters.programs.programFilterOptions)
         }
       },
-      body: Selector(DASHBOARD_SELECTORS.tables.programs + '> tbody').addCustomMethods({
+      headers: Selector(DASHBOARD_SELECTORS.tables.programs.headers).addCustomMethods({
+        colIdx: (headers, label) => {
+          for (var i = 0; i < headers.children.length; i++) {
+            if (headers.children[i].innerText.indexOf(label) !== -1) {
+              return i;
+            }
+          }
+          return -1;
+        }
+      }),
+      body: Selector(DASHBOARD_SELECTORS.tables.programs.body).addCustomMethods({
         data: (table, rowIndex, columnIndex) => {
           return table.rows[rowIndex].cells[columnIndex].innerText;
         },
@@ -44,8 +54,16 @@ class DashboardPageMap {
           return table.rows[rowIndex].cells[columnIndex].style;
         },
         rowCount: table => table.rows.length,
-      }),
-      rows: Selector(DASHBOARD_SELECTORS.tables.programs + '> tbody > tr')
+        rowIdx: (table, programDef) => {
+          for (var i = 0; i < table.rows.length; i++) {
+            if (table.rows[i].cells[programDef.progCol].innerText.indexOf(programDef.program) !== -1 && 
+                table.rows[i].cells[programDef.prodCol].innerText.indexOf(programDef.product) !== -1) {
+              return i;
+            }
+          }
+          return -1;
+        }
+      })
     };
 
     this.postionsTable = Selector(DASHBOARD_SELECTORS.tables.positions);
@@ -57,6 +75,38 @@ class DashboardPageMap {
 
   async subMenu(menu) {
     return Selector(TEMPLATE_SELECTORS.menu[menu]['subMenu']);
+  }
+
+  async getProgramRowIndex(program, product) {
+    const progCol = await this.programsTable.headers.colIdx("Program");
+    const prodCol = await this.programsTable.headers.colIdx("Product");
+    const programDef = {
+      program: program,
+      product: product,
+      progCol: progCol,
+      prodCol: prodCol
+    }
+    return await this.programsTable.body.rowIdx(programDef);
+  }
+
+  async getProgramData(program, product) {
+    const row = await this.getProgramRowIndex(program, product);
+    const progIdx = await this.programsTable.headers.colIdx('Program');
+    const prodIdx = await this.programsTable.headers.colIdx('Product');
+    const pVolIdx = await this.programsTable.headers.colIdx('Physical Volume');
+    const hVolIdx = await this.programsTable.headers.colIdx('Hedge Volume');
+    const avgCostIdx = await this.programsTable.headers.colIdx('Avg Cost');
+    const m2mIdx = await this.programsTable.headers.colIdx('Marked to Market');
+    const hBalIdx = await this.programsTable.headers.colIdx('Hedge Balance');
+    return {
+      program: await this.programsTable.body.data(row, progIdx),
+      product: await this.programsTable.body.data(row, prodIdx),
+      physicalVolume: await this.programsTable.body.data(row, pVolIdx),
+      hedgeVolume: await this.programsTable.body.data(row, hVolIdx),
+      avgCost: await this.programsTable.body.data(row, avgCostIdx),
+      m2mCost: await this.programsTable.body.data(row, m2mIdx),
+      hedgeBalance: await this.programsTable.body.data(row, hBalIdx)
+    }
   }
 }
 
@@ -122,6 +172,36 @@ class DashboardPageValidator extends BaseValidator {
     console.log(out3);
     await this.t.expect(this.m.programsTable.body.data(3, 2)).eql('45210');
   }
+
+  async columnLabelIdx(label, idx) {
+    await this.t.expect(this.m.programsTable.headers.colIdx(label)).eql(idx);
+  }
+
+  async programIdx(program, product, idx) {
+    const progCol = await this.m.programsTable.headers.colIdx('Program');
+    const prodCol = await this.m.programsTable.headers.colIdx('Product');
+    const programDef = {
+      program: program,
+      product: product,
+      progCol: progCol,
+      prodCol: prodCol
+    }
+    await this.t.expect(this.m.programsTable.body.rowIdx(programDef)).eql(idx);
+  }
+
+  async programValue(program, product, field, value) {
+    const progCol = await this.m.programsTable.headers.colIdx('Program');
+    const prodCol = await this.m.programsTable.headers.colIdx('Product');
+    const programDef = {
+      program: program,
+      product: product,
+      progCol: progCol,
+      prodCol: prodCol
+    }
+    const programRow = await this.m.programsTable.body.rowIdx(programDef);
+    const valueCol = await this.m.programsTable.headers.colIdx(field);
+    await this.t.expect(this.m.programsTable.body.data(programRow, valueCol)).eql(value);
+  }
 }
 
 class DashboardPage extends BasePage {
@@ -147,7 +227,7 @@ class DashboardPage extends BasePage {
 
   async showPrograms(program) {
     await this.t.click(this.m.programsOverviewTab);
-    if (program && program != 'all') {
+    if (program) {
       await this.clickFilterOption(this.m.programsTable.filters.programFilter.element, program);
     }
   }

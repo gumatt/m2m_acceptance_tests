@@ -53,9 +53,7 @@ class HedgeTransactionPageMap {
         return table.rows[rowIdx].cells[colIdx].style;
       }
     });
-    this.transFields = Selector(
-      selectors.Tables.TransTable.Columns
-    ).addCustomMethods({
+    this.transFields = Selector(selectors.Tables.TransTable.Columns).addCustomMethods({
       getFieldIdx: (fields, fieldName) => {
         for (var i = 0; i < fields.children.length; i++) {
           if (fields.children[i].innerText.indexOf(fieldName) !== -1) {

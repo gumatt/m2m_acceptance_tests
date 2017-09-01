@@ -5,7 +5,10 @@ import { urls } from '../config';
 import {
   HedgeTransactionPage,
   HedgeTransactionPageValidator,
-  HedgeTransactionPageMap
+  HedgeTransactionPageMap,
+  DashboardPage,
+  DashboardPageMap,
+  DashboardPageValidator
 } from '../pages';
 import { userRole as user } from '../helpers/roles';
 import { simple_hedge_txn } from '../data/hedge_transactions';
@@ -14,9 +17,13 @@ const map = new HedgeTransactionPageMap();
 const validator = new HedgeTransactionPageValidator(map);
 const page = new HedgeTransactionPage(urls.hedge_txn_log, map, validator);
 
+const dashMap = new DashboardPageMap();
+const dashValidator = new DashboardPageValidator(dashMap);
+const dash = new DashboardPage(urls.dashboard, dashMap, dashValidator);
+
 fixture`Enter Hedge Transaction`
   .page`${urls.hedge_txn_log}`.beforeEach(async () => {
-  await page.navigateToAs(user);
+  await page.visitAs(user);
 });
 
 test('Hedge Transaction Log Exists', async () => {
@@ -75,5 +82,58 @@ test('Modify Hedge Trans', async () => {
     await page.validate().transNoHasPrice(simple_hedge_txn.name, new_price);
   })
   .after(async () => {
+    await page.removeTransaction(simple_hedge_txn);
+  });
+
+  test('Dashboard page visitor', async () => {
+    await dash.visitAs(user);
+    await dash.validate().location(urls.dashboard);    
+  }); 
+
+  test('"Working"" transactions do not affect program values', async () => {
+    const txn = simple_hedge_txn
+
+    // grab initial values
+    await dash.visitAs(user);
+    const initState = await dash.m.getProgramData(txn.inventory, txn.product);
+
+    // add a working order
+    txn.status = 'Working'
+    await page.visitAs(user);
+    await page.addTransaction(txn);
+
+    await dash.visitAs(user);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Physical Volume', initState.physicalVolume);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Hedge Volume', initState.hedgeVolume); 
+    await dash.validate().programValue(txn.inventory, txn.product, 'Avg Cost', initState.avgCost);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Marked to Market', initState.m2mCost);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Hedge Balance', initState.hedgeBalance);
+  })
+  .after(async () => {
+    await page.visitAs(user)
+    await page.removeTransaction(simple_hedge_txn);
+  });
+
+  test('"Canceled"" transactios do not affect program values', async () => {
+    const txn = simple_hedge_txn
+
+    // grab initial values
+    await dash.visitAs(user);
+    const initState = await dash.m.getProgramData(txn.inventory, txn.product);
+
+    // add a working order
+    txn.status = 'Canceled'
+    await page.visitAs(user);
+    await page.addTransaction(txn);
+
+    await dash.visitAs(user);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Physical Volume', initState.physicalVolume);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Hedge Volume', initState.hedgeVolume); 
+    await dash.validate().programValue(txn.inventory, txn.product, 'Avg Cost', initState.avgCost);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Marked to Market', initState.m2mCost);
+    await dash.validate().programValue(txn.inventory, txn.product, 'Hedge Balance', initState.hedgeBalance);
+  })
+  .after(async () => {
+    await page.visitAs(user)
     await page.removeTransaction(simple_hedge_txn);
   });

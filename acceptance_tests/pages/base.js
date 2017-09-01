@@ -28,7 +28,7 @@ class BasePage {
     this.url = url;
   }
 
-  async navigateToAs(user) {
+  async visitAs(user) {
     await this.t
       .useRole(user)
       .navigateTo(this.url);

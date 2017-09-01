@@ -48,7 +48,11 @@ const DASHBOARD_SELECTORS = {
     fieldsMenu: '#hedge-pos > div.bootstrap-table > div.fixed-table-toolbar > div.columns.columns-right.btn-group.pull-right > div > ul'
   },
   tables: {
-    programs: '#table14',
+    programs: {
+      table: '#table14',
+      headers: '#table14 > thead > tr',
+      body: '#table14 > tbody'
+    },
     positions: '#table13',
     hedgeLog: '#table12',
     physicalLog: '#table11'
